@@ -2,6 +2,7 @@ import requests
 import json
 import os
 
+
 class TokenGerador:
     def __init__(self):
         pass
@@ -42,14 +43,11 @@ class APICliente:
     def __init__(self, token_manager):
         self.token_manager = token_manager
 
-
     def obter_dados(self, part_number):
 
         access_token = self.token_manager.ler_txt_token()
-
         url = f'{self.BASE_URL}{part_number}'
         headers = {'accept': 'application/json', 'Authorization': f'Bearer {access_token}'}
-
         response = requests.get(url, headers=headers)
 
         if response.status_code == 401:
@@ -60,6 +58,7 @@ class APICliente:
             return response
 
 class JSONFilter:
+
     @staticmethod
     def filtrar_dados(data, filtro_json, item_filtro=None):
         try:
@@ -70,22 +69,27 @@ class JSONFilter:
         if item_filtro:
             try:
                 filtrados = [dado for dado in retorno if dado.get("item") == item_filtro]
-                retorno = filtrados[0]['descricao']
-                return retorno
+                return filtrados[0]['descricao']
             except IndexError:
                 return f'"{item_filtro}" indisponível.'
-        
         return retorno
+    
 
-token_manager = TokenGerador()
-api_cliente = APICliente(token_manager)
-filtro = JSONFilter()
 
-cod_porduto_teste = input("Digite o código que deseja pesquisar: ").replace('  ', '')
-response = api_cliente.obter_dados(cod_porduto_teste)
+def exec():
 
-if response:
-    data = response.json()
-    print(f'Marca: {filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")}')
-    print(f'Aplicação: {filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")}')
-    print(f'Peso: {filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")}')
+    token_manager = TokenGerador()
+    api_cliente = APICliente(token_manager)
+    filtro = JSONFilter()
+    cod_porduto_teste = input("Digite o código que deseja pesquisar: ").replace('  ', '')
+    response = api_cliente.obter_dados(cod_porduto_teste)
+
+    if response:
+        data = response.json()
+        print(f'Marca: {filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")}')
+        print(f'Aplicação: {filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")}')
+        print(f'Peso: {filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")}')
+    return None
+
+if __name__ == "__main__":
+    exec()
