@@ -2,8 +2,6 @@ import requests
 from token_gerador import gerar_arquivo_token, ler_txt_token
 import json
 
-# Teste de edição de arquivo diretamente no github
-
 # token_acesso = get_access_token(client_key_value, client_secret_value)
 def retorno_dados(part_number):
 
