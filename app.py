@@ -1,49 +1,91 @@
 import requests
-from token_gerador import gerar_arquivo_token, ler_txt_token
 import json
+import os
 
-# token_acesso = get_access_token(client_key_value, client_secret_value)
-def retorno_dados(part_number):
+class TokenGerador:
+    def __init__(self):
+        pass
 
-    access_token = ler_txt_token()
+    CLIENT_KEY=os.getenv('CLIENT_KEY')
+    CLIENT_SECRET=os.getenv('CLIENT_SECRET')
+ 
+    def get_access_token(self):
 
-    url = f'https://api.intelliauto.com.br/v1/produtos/partnumber/{part_number}'
-    headers = {'accept': 'application/json', 'Authorization': f'Bearer {access_token}'}
-    response = requests.get(url, headers=headers)
+        token_url = 'https://api.intelliauto.com.br/v1/login'
+        token_payload = {
+            'clientKey': self.CLIENT_KEY,
+            'clientSecret': self.CLIENT_SECRET
+        }
+        token_response = requests.post(token_url, json=token_payload)
+        if token_response.status_code == 200:
+            return token_response.json().get('accessToken')
+        return None
 
-    if response.status_code == 401:
-         gerar_arquivo_token()
-         return retorno_dados(part_number)
+    def gerar_arquivo_token(self):
+        token = self.get_access_token()
+        with open("token.txt", "w", encoding="utf-8") as arquivo:
+            arquivo.write(token)
 
-    if response.status_code == 200:
-        return response
+    def ler_txt_token(self):
+        try:
+            with open("token.txt", "r", encoding="utf-8") as arquivo:
+                access_token = arquivo.read()
+                return access_token
+            
+        except FileNotFoundError:
+            self.gerar_arquivo_token()
+            self.ler_txt_token()
+
+class APICliente:
+    BASE_URL = 'https://api.intelliauto.com.br/v1/produtos/partnumber/'
     
-def filtro_dados_json(part_number, filtro_json, item_filtro=None):
-    data = retorno_dados(part_number).json()
+    def __init__(self, token_manager):
+        self.token_manager = token_manager
 
-    # Avaliação do caminho fornecido no filtro
-    try:
-        retorno = eval(f"data{filtro_json}")
-    except Exception as e:
-        return f"Erro ao acessar dados com o filtro: {e}"
 
-    # Filtro adicional baseado no campo "item", se fornecido
-    try:
+    def obter_dados(self, part_number):
+
+        access_token = self.token_manager.ler_txt_token()
+
+        url = f'{self.BASE_URL}{part_number}'
+        headers = {'accept': 'application/json', 'Authorization': f'Bearer {access_token}'}
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 401:
+            self.token_manager.gerar_arquivo_token()
+            return self.obter_dados(part_number)
+
+        if response.status_code == 200:
+            return response
+
+class JSONFilter:
+    @staticmethod
+    def filtrar_dados(data, filtro_json, item_filtro=None):
+        try:
+            retorno = eval(f"data{filtro_json}")
+        except Exception as e:
+            return f"Erro ao acessar dados com o filtro: {e}"
+        
         if item_filtro:
-            filtrados = [dado for dado in retorno if dado.get("item") == item_filtro]
-            retorno = filtrados[0]['descricao']
-            return retorno
-    except IndexError:
-        return f'"{item_filtro}" indisponível.'
-    return retorno
+            try:
+                filtrados = [dado for dado in retorno if dado.get("item") == item_filtro]
+                retorno = filtrados[0]['descricao']
+                return retorno
+            except IndexError:
+                return f'"{item_filtro}" indisponível.'
+        
+        return retorno
 
-# Exemplo de uso + Caminhos no json (Lembrando que passamos o caminho bruto e
-# Junto com a função enviamos o item que vamos puxar)
+token_manager = TokenGerador()
+api_cliente = APICliente(token_manager)
+filtro = JSONFilter()
 
-cod_porduto_teste = input("Digite o código que deseja pesquisar: ")
-cod_porduto_teste = cod_porduto_teste.replace(' ', '').replace('  ', '')
+cod_porduto_teste = input("Digite o código que deseja pesquisar: ").replace('  ', '')
+response = api_cliente.obter_dados(cod_porduto_teste)
 
-print(f'Marca: {filtro_dados_json(cod_porduto_teste, "['data'][0]['marca']['nome']")}')
-print(f'Aplicação: {filtro_dados_json(cod_porduto_teste, "['data'][0]['aplicacoes'][0]['descricaoFrota']")}')
-print(f'Peso: {filtro_dados_json(cod_porduto_teste, "['data'][0]['especificacoes']", "Peso bruto")}')
-
+if response:
+    data = response.json()
+    print(f'Marca: {filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")}')
+    print(f'Aplicação: {filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")}')
+    print(f'Peso: {filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")}')
