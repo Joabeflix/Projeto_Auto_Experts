@@ -15,7 +15,7 @@ class interface():
         self.entrada_codigo = ttk.Entry(root, width=30)
         self.entrada_codigo.place(x=150, y=30)
 
-        self.botao_inserir = ttk.Button(root, text="Pesquisar", width=9, command=lambda: self.inserir_texto(self.buascar_conteudo(self.ler_codigo_produto())))
+        self.botao_inserir = ttk.Button(root, text="Pesquisar", width=9, command=lambda: self.inserir_texto(self.buscar_conteudo(self.ler_codigo_produto())))
         self.botao_inserir.place(x=162, y=70)
 
         self.botao_remover = ttk.Button(root, text="Limpar", width=9, command=self.remover_texto)
@@ -29,7 +29,7 @@ class interface():
         # 2 = Peso
         linha = "-" * 78
         if dados:
-            texto = f'Marca: {dados[0]}\n{linha}\nAplicação: \n{dados[1]}\n{linha}\nPeso: {dados[2]}'
+            texto = f'Produto: {dados[0]}\n{linha}\nMarca: {dados[1]}\n{linha}\nAplicação: \n{dados[2]}\n{linha}\nPeso: {dados[3]}'
             self.bloco_texto.insert(tk.END, texto)
 
     def remover_texto(self, texto_remover=None):
@@ -49,7 +49,7 @@ class interface():
         messagebox.showwarning("Erro", "Você não digitou um código.")
         return None
     
-    def buascar_conteudo(self, codigo_produto):
+    def buscar_conteudo(self, codigo_produto):
         if codigo_produto:
             token_manager = TokenGerador()
             api_cliente = APICliente(token_manager)
@@ -58,10 +58,12 @@ class interface():
 
             if response:
                 data = response.json()
+                nome = filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricao']")
                 marca = filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")
                 aplicacao = filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")
                 peso = filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")
-                return [marca, aplicacao, peso]
+                
+                return [nome, marca, aplicacao, peso]
         return None
    
 
