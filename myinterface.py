@@ -7,37 +7,43 @@ class interface():
     def __init__(self, root):
         self.root = root
 
-        self.texto = ttk.Label(root, text="Código").place(x=3, y=3)
+        self.texto = ttk.Label(root, text="Código do produto").place(x=193, y=4)
 
-        self.bloco_texto1 = ttk.Text(root, height=3, width=30)
-        self.bloco_texto1.place(x=10, y=30)
+        self.bloco_texto = ttk.Text(root, height=25, width=65)
+        self.bloco_texto.place(x=48, y=125)
 
-        self.bloco_texto2 = ttk.Text(root, height=3, width=30)
-        self.bloco_texto2.place(x=10, y=90)
+        self.entrada_codigo = ttk.Entry(root, width=30)
+        self.entrada_codigo.place(x=150, y=30)
 
-        self.entrada_teste = ttk.Entry(root, width=30)
-        self.entrada_teste.place(x=3, y=160)
+        self.botao_inserir = ttk.Button(root, text="Pesquisar", width=9, command=lambda: self.inserir_texto(self.buascar_conteudo(self.ler_codigo_produto())))
+        self.botao_inserir.place(x=162, y=70)
 
-        self.botao_inserir = ttk.Button(root, text="Inserir", command=lambda: self.inserir_texto(self.buascar_conteudo(self.ler_codigo_produto())))
-        self.botao_inserir.place(x=3, y=200)
-
-        self.botao_remover = ttk.Button(root, text="Remover", command=self.remover_texto)
-        self.botao_remover.place(x=70, y=200)
+        self.botao_remover = ttk.Button(root, text="Limpar", width=9, command=self.remover_texto)
+        self.botao_remover.place(x=253, y=70)
 
     def inserir_texto(self, dados):
+        self.remover_texto('bloco_texto')
+        # indices:
+        # 0 = Marca
+        # 1 = Aplicação
+        # 2 = Peso
+        linha = "-" * 78
         if dados:
-            marca = dados[0]
-            aplicacao = dados[1]
-            self.bloco_texto1.insert(tk.END, marca)
-            self.bloco_texto2.insert(tk.END, aplicacao)
+            texto = f'Marca: {dados[0]}\n{linha}\nAplicação: \n{dados[1]}\n{linha}\nPeso: {dados[2]}'
+            self.bloco_texto.insert(tk.END, texto)
 
-    def remover_texto(self):
-        self.bloco_texto1.delete(1.0, tk.END)
-        self.bloco_texto2.delete(1.0, tk.END)
+    def remover_texto(self, texto_remover=None):
+
+        if texto_remover:
+            self.bloco_texto.delete(1.0, tk.END)
+            return None
+        
+        self.bloco_texto.delete(1.0, tk.END)
+        self.entrada_codigo.delete(0, tk.END)
 
     def ler_codigo_produto(self):
         
-        codigo_produto = self.entrada_teste.get()
+        codigo_produto = self.entrada_codigo.get()
         if codigo_produto:
             return codigo_produto
         messagebox.showwarning("Erro", "Você não digitou um código.")
@@ -55,7 +61,7 @@ class interface():
                 marca = filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")
                 aplicacao = filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")
                 peso = filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")
-                return [marca, aplicacao]
+                return [marca, aplicacao, peso]
         return None
    
 
@@ -63,6 +69,8 @@ class interface():
 if __name__ == "__main__":
     root = tk.Tk()
     meu_app = interface(root)
-    root.title('Dados Produtos')
-    root.geometry('256x300')
+    root.title('Catálogo AutoExperts')
+    root.geometry('500x555')
+    root.minsize(width=500, height=555)
+    root.maxsize(width=500, height=555)
     root.mainloop()
