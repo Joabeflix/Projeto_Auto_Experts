@@ -125,7 +125,3 @@ def exec(dados_necessarios=[]):
                 
     return dict(lista_retorno)
                     
-
-dados = exec(['nome', 'peso', 'ean', 'ncm', 'aplicacao'])
-print(dados)
-
