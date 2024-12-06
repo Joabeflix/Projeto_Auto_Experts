@@ -76,20 +76,56 @@ class JSONFilter:
     
 
 
-def exec():
+def exec(dados_necessarios=[]):
 
     token_manager = TokenGerador()
     api_cliente = APICliente(token_manager)
     filtro = JSONFilter()
-    cod_porduto_teste = input("Digite o código que deseja pesquisar: ").replace('  ', '')
+    cod_porduto_teste = 'C-5682' # input("Digite o código que deseja pesquisar: ").replace('  ', '')
     response = api_cliente.obter_dados(cod_porduto_teste)
+    dados = response.json()
 
     if response:
-        data = response.json()
-        print(f'Marca: {filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")}')
-        print(f'Aplicação: {filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")}')
-        print(f'Peso: {filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")}')
-    return None
 
-if __name__ == "__main__":
-    exec()
+        mapeamentos = {
+            'nome': {
+                'mapeamento': "['data'][0]['aplicacoes'][0]['descricao']",
+                'mapeamento_secundario': False},
+            'marca': {
+                'mapeamento': "['data'][0]['marca']['nome']",
+                'mapeamento_secundario': False},
+            'aplicacao': {
+                'mapeamento': "['data'][0]['aplicacoes'][0]['descricaoFrota']",
+                'mapeamento_secundario': False},
+            'ean': {
+                'mapeamento': "['data'][0]['especificacoes']",
+                'mapeamento_secundario': 'Código de barras (EAN)'},
+            'ncm': {
+                'mapeamento': "['data'][0]['especificacoes']",
+                'mapeamento_secundario': 'NCM'},
+            'peso': {
+                'mapeamento': "['data'][0]['especificacoes']",
+                'mapeamento_secundario': 'Peso bruto'}
+        }
+
+        lista_retorno = []
+
+        for i in dados_necessarios:
+            if i in mapeamentos.keys():
+                mapeamento_primario = mapeamentos[i]['mapeamento']
+                mapeamento_secundario = mapeamentos[i]['mapeamento_secundario']
+
+                if mapeamento_secundario:
+                    valor = filtro.filtrar_dados(dados, mapeamento_primario, mapeamento_secundario)
+                    lista_retorno.append((i, valor))
+                else:
+                    valor = filtro.filtrar_dados(dados, mapeamento_primario)
+                    lista_retorno.append((i, valor))
+
+                
+    return dict(lista_retorno)
+                    
+
+dados = exec(['nome', 'peso', 'ean', 'ncm', 'aplicacao'])
+print(dados)
+

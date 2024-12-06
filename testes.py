@@ -1,16 +1,12 @@
-from app import TokenGerador, APICliente, JSONFilter
 
-token_manager = TokenGerador()
-api_cliente = APICliente(token_manager)
-filtro = JSONFilter()
+x = {'nome': 'd',
+      'marca': '2',
+      'aplicacao': '3',
+      'ean': '4',
+      'ncm': '5',
+      'peso': '6'}
 
-cod_porduto_teste = input("Digite o código que deseja pesquisar: ").replace('  ', '')
-response = api_cliente.obter_dados(cod_porduto_teste)
 
-if response:
-    data = response.json()
-    marca = filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")
-    aplicacao = filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")
-    peso = filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")
+print(x.keys())
 
 

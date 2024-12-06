@@ -4,7 +4,7 @@ from app import TokenGerador, APICliente, JSONFilter
 
 
 class exel():
-    def __init__(self) -> None:
+    def __init__(self):
         pass
 
     def gerar_planilha_padrao(self, local_salvar):
