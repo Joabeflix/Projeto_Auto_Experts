@@ -75,53 +75,64 @@ class JSONFilter:
         return retorno
     
 
-
-def exec(dados_necessarios=[]):
+def exec(codigo_produto, dados_necessarios=[]):
 
     token_manager = TokenGerador()
     api_cliente = APICliente(token_manager)
     filtro = JSONFilter()
-    cod_porduto_teste = 'C-5682' # input("Digite o código que deseja pesquisar: ").replace('  ', '')
-    response = api_cliente.obter_dados(cod_porduto_teste)
+    response = api_cliente.obter_dados(codigo_produto)
     dados = response.json()
 
     if response:
-
+        
         mapeamentos = {
             'nome': {
                 'mapeamento': "['data'][0]['aplicacoes'][0]['descricao']",
-                'mapeamento_secundario': False},
+                'mapeamento_secundario': False
+            },
             'marca': {
                 'mapeamento': "['data'][0]['marca']['nome']",
-                'mapeamento_secundario': False},
+                'mapeamento_secundario': False
+            },
             'aplicacao': {
                 'mapeamento': "['data'][0]['aplicacoes'][0]['descricaoFrota']",
-                'mapeamento_secundario': False},
+                'mapeamento_secundario': False
+            },
             'ean': {
                 'mapeamento': "['data'][0]['especificacoes']",
-                'mapeamento_secundario': 'Código de barras (EAN)'},
+                'mapeamento_secundario': "Código de barras (EAN)"
+            },
             'ncm': {
                 'mapeamento': "['data'][0]['especificacoes']",
-                'mapeamento_secundario': 'NCM'},
+                'mapeamento_secundario': "NCM"
+            },
             'peso': {
                 'mapeamento': "['data'][0]['especificacoes']",
-                'mapeamento_secundario': 'Peso bruto'}
+                'mapeamento_secundario': "Peso bruto"
+            }
         }
 
         lista_retorno = []
 
-        for i in dados_necessarios:
-            if i in mapeamentos.keys():
-                mapeamento_primario = mapeamentos[i]['mapeamento']
-                mapeamento_secundario = mapeamentos[i]['mapeamento_secundario']
+        for dado in dados_necessarios:
 
+            if dado in mapeamentos.keys():
+                mapeamento_primario = mapeamentos[dado]['mapeamento']
+                mapeamento_secundario = mapeamentos[dado]['mapeamento_secundario']
+                
                 if mapeamento_secundario:
                     valor = filtro.filtrar_dados(dados, mapeamento_primario, mapeamento_secundario)
-                    lista_retorno.append((i, valor))
+                    lista_retorno.append((dado, valor))
+                
                 else:
                     valor = filtro.filtrar_dados(dados, mapeamento_primario)
-                    lista_retorno.append((i, valor))
+                    lista_retorno.append((dado, valor))
+
+
+    return dict(lista_retorno)
+
+
 
                 
-    return dict(lista_retorno)
+
                     

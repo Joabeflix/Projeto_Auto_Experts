@@ -1,12 +1,9 @@
-
-x = {'nome': 'd',
-      'marca': '2',
-      'aplicacao': '3',
-      'ean': '4',
-      'ncm': '5',
-      'peso': '6'}
+from app import exec
 
 
-print(x.keys())
+x = exec('C-3473', ['nome', 'ean', 'peso'])
 
+nome = x.get('nome')
+
+print(nome)
 

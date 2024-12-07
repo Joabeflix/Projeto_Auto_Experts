@@ -1,4 +1,4 @@
-from app import TokenGerador, APICliente, JSONFilter
+from app import exec
 import tkinter as tk
 from tkinter import messagebox
 import ttkbootstrap as ttk
@@ -23,10 +23,6 @@ class interface():
 
     def inserir_texto(self, dados):
         self.remover_texto('bloco_texto')
-        # indices:
-        # 0 = Marca
-        # 1 = Aplicação
-        # 2 = Peso
         linha = "-" * 78
         if dados:
             texto = f'Produto: {dados[0]}\n{linha}\nMarca: {dados[1]}\n{linha}\nAplicação: \n{dados[2]}\n{linha}\nPeso: {dados[3]}'
@@ -50,21 +46,8 @@ class interface():
         return None
     
     def buscar_conteudo(self, codigo_produto):
-        if codigo_produto:
-            token_manager = TokenGerador()
-            api_cliente = APICliente(token_manager)
-            filtro = JSONFilter()
-            response = api_cliente.obter_dados(codigo_produto)
-
-            if response:
-                data = response.json()
-                nome = filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricao']")
-                marca = filtro.filtrar_dados(data, "['data'][0]['marca']['nome']")
-                aplicacao = filtro.filtrar_dados(data, "['data'][0]['aplicacoes'][0]['descricaoFrota']")
-                peso = filtro.filtrar_dados(data, "['data'][0]['especificacoes']", "Peso bruto")
-                
-                return [nome, marca, aplicacao, peso]
-        return None
+        retorno = exec(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
+        return list(retorno.values())
    
 
 # Inicializa a interface gráfica e executa o loop principal do Tkinter
