@@ -27,20 +27,12 @@ class exel():
         for codigo in planilha['Código Produto']:
             retorno = exec(codigo, ['nome', 'marca', 'aplicacao', 'peso', 'ean', 'ncm'])
             
-            nome = retorno.get('nome')
-            marca = retorno.get('marca')
-            aplicacao = retorno.get('aplicacao')
-            peso = retorno.get('peso')
-            ean = retorno.get('ean')
-            ncm = retorno.get('ncm')
-
-
-            lista_nome.append(nome)
-            lista_marca.append(marca)
-            lista_aplicacao.append(aplicacao)
-            lista_peso.append(peso)
-            lista_ean.append(ean)
-            lista_ncm.append(ncm)
+            lista_nome.append(retorno.get('nome'))
+            lista_marca.append(retorno.get('marca'))
+            lista_aplicacao.append(retorno.get('aplicacao'))
+            lista_peso.append(retorno.get('peso'))
+            lista_ean.append(retorno.get('ean'))
+            lista_ncm.append(retorno.get('ncm'))
 
         planilha['Nome'] = lista_nome
         planilha['Marca'] = lista_marca
