@@ -105,6 +105,8 @@ class ImagemProduto():
         # Criação de uma nova janela para exibição
         janela = tk.Toplevel(root)
         janela.title(f'Imagem produto: {self.codigo_produto}')
+        janela.minsize(width=500, height=500)
+        janela.maxsize(width=500, height=500)
 
         # Carregar a imagem com Pillow
         image_path = f'temp/{self.codigo_produto}.jpg'

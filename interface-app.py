@@ -71,4 +71,3 @@ if __name__ == "__main__":
     root.maxsize(width=500, height=555)
     root.mainloop()
     ImagemProduto().limpar_imagens()
-
