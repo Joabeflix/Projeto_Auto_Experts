@@ -1,4 +1,5 @@
 from app import exec
+from app import ImagemProduto
 import tkinter as tk
 from tkinter import messagebox
 import ttkbootstrap as ttk
@@ -21,6 +22,8 @@ class interface():
         self.botao_remover = ttk.Button(root, text="Limpar", width=9, command=self.remover_texto)
         self.botao_remover.place(x=253, y=70)
 
+        self.botao_imagem = ttk.Button(root, text="Ver imagem", width=13, command=lambda: self.mostrar_imagem(self.ler_codigo_produto()))
+        self.botao_imagem.place(x=209, y=520)
     def inserir_texto(self, dados):
         self.remover_texto('bloco_texto')
         linha = "-" * 78
@@ -47,7 +50,15 @@ class interface():
     
     def buscar_conteudo(self, codigo_produto):
         retorno = exec(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
+        baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
         return list(retorno.values())
+    
+    def mostrar_imagem(self, codigo_produto):
+        if codigo_produto:
+            imagem = ImagemProduto(codigo_produto)
+            imagem.mostrar_imagem(self.root)
+        return None
+
    
 
 # Inicializa a interface gráfica e executa o loop principal do Tkinter
@@ -59,3 +70,5 @@ if __name__ == "__main__":
     root.minsize(width=500, height=555)
     root.maxsize(width=500, height=555)
     root.mainloop()
+    ImagemProduto().limpar_imagens()
+

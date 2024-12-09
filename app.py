@@ -1,7 +1,8 @@
 import requests
 import json
 import os
-
+import tkinter as tk
+from PIL import Image, ImageTk
 
 class TokenGerador:
     def __init__(self):
@@ -74,6 +75,57 @@ class JSONFilter:
                 return f'"{item_filtro}" indisponível.'
         return retorno
     
+class ImagemProduto():
+    def __init__(self, codigo_produto=None):
+        self.codigo_produto = codigo_produto
+
+    def baixar_imagem(self):
+
+        url = exec(self.codigo_produto, ['imagem_url'])['imagem_url']
+        # exec(cod, ['imagem_url'])['imagem_url']
+
+        # Nome do arquivo para salvar a imagem
+        nome_arquivo = f"temp/{self.codigo_produto}.jpg"
+
+        try:
+            # Fazer a solicitação GET
+            resposta = requests.get(url)
+            # Verificar se a requisição foi bem-sucedida
+            if resposta.status_code == 200:
+                # Salvar o conteúdo da imagem em um arquivo
+                with open(nome_arquivo, 'wb') as arquivo:
+                    arquivo.write(resposta.content)
+                print(f"Imagem salva como {nome_arquivo}")
+            else:
+                print(f"Erro ao baixar a imagem: {resposta.status_code}")
+        except Exception as e:
+            print(f"Ocorreu um erro: {e}")
+
+    def mostrar_imagem(self, root):
+        # Criação de uma nova janela para exibição
+        janela = tk.Toplevel(root)
+        janela.title(f'Imagem produto: {self.codigo_produto}')
+
+        # Carregar a imagem com Pillow
+        image_path = f'temp/{self.codigo_produto}.jpg'
+        try:
+            img = Image.open(image_path)
+            img = img.resize((500, 500))
+            tk_image = ImageTk.PhotoImage(img)
+
+            # Criar um widget Label para exibir a imagem
+            label = tk.Label(janela, image=tk_image)
+            label.image = tk_image  # Preserva a referência
+            label.pack()
+        except Exception as e:
+            print(f"Erro ao exibir a imagem: {e}")
+        
+    def limpar_imagens(self):
+        os.chdir('temp')
+        for imagem in os.listdir():
+            os.remove(imagem)
+        os.chdir('..')
+
 
 def exec(codigo_produto, dados_necessarios=[]):
 
@@ -109,6 +161,14 @@ def exec(codigo_produto, dados_necessarios=[]):
             'peso': {
                 'mapeamento': "['data'][0]['especificacoes']",
                 'mapeamento_secundario': "Peso bruto"
+            },
+            'imagem_url': {
+                'mapeamento': "['data'][0]['imagens'][0]['url']",
+                'mapeamento_secundario': False
+            },
+            'json_completo': {
+                'mapeamento': "['data']",
+                'mapeamento_secundario': False
             }
         }
 
@@ -131,8 +191,13 @@ def exec(codigo_produto, dados_necessarios=[]):
 
     return dict(lista_retorno)
 
-
-
+if __name__ == "__main__":
+#    cod = 'C-5682'
+#    url = exec(cod, ['imagem_url'])['imagem_url']
+#    print(url)
+    app = ImagemProduto('C-5682')
+    app.baixar_imagem()
+    app.mostrar_imagem()
                 
 
                     
