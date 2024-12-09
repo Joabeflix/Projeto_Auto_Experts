@@ -1,6 +1,6 @@
 import pandas as pd
 import time
-from app import exec
+from app import puxar_dados_api
 
 
 class exel():
@@ -25,7 +25,7 @@ class exel():
         lista_ncm = []
 
         for codigo in planilha['Código Produto']:
-            retorno = exec(codigo, ['nome', 'marca', 'aplicacao', 'peso', 'ean', 'ncm'])
+            retorno = puxar_dados_api(codigo, ['nome', 'marca', 'aplicacao', 'peso', 'ean', 'ncm'])
             
             lista_nome.append(retorno.get('nome'))
             lista_marca.append(retorno.get('marca'))

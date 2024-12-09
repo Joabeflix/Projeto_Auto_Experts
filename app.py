@@ -81,7 +81,7 @@ class ImagemProduto():
 
     def baixar_imagem(self):
 
-        url = exec(self.codigo_produto, ['imagem_url'])['imagem_url']
+        url = puxar_dados_api(self.codigo_produto, ['imagem_url'])['imagem_url']
         # exec(cod, ['imagem_url'])['imagem_url']
 
         # Nome do arquivo para salvar a imagem
@@ -129,7 +129,7 @@ class ImagemProduto():
         os.chdir('..')
 
 
-def exec(codigo_produto, dados_necessarios=[]):
+def puxar_dados_api(codigo_produto, dados_necessarios=[]):
 
     token_manager = TokenGerador()
     api_cliente = APICliente(token_manager)

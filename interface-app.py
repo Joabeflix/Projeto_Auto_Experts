@@ -1,4 +1,4 @@
-from app import exec
+from app import puxar_dados_api
 from app import ImagemProduto
 import tkinter as tk
 from tkinter import messagebox
@@ -49,7 +49,7 @@ class interface():
         return None
     
     def buscar_conteudo(self, codigo_produto):
-        retorno = exec(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
+        retorno = puxar_dados_api(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
         baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
         return list(retorno.values())
     
