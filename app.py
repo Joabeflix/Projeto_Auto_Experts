@@ -63,9 +63,12 @@ class JSONFilter:
     @staticmethod
     def filtrar_dados(data, filtro_json, item_filtro=None):
         try:
+
             retorno = eval(f"data{filtro_json}")
+
         except Exception as e:
-            return f"Erro ao acessar dados com o filtro: {e}"
+            print(f"Erro ao acessar dados com o filtro: {e}")
+            return f""
         
         if item_filtro:
             try:
@@ -129,14 +132,49 @@ class ImagemProduto():
         os.chdir('..')
 
 
+def acerto_codigo_produto(codigo_produto, indice=2):
+    print(indice)
+
+    texto_saida = codigo_produto.replace(' ', '')
+    texto_saida = texto_saida.upper()
+
+    print('Dentro do acerto')
+    print(f'código atual é {texto_saida}')
+
+    # Espaço após 2 letras
+    lista_padrao_2 = ['MG', 'HG', 'AC']
+    lista_padrao_3 = ['NKF']
+    lista_padrao_4 = ['NCDE']
+
+    if indice == 5:
+        return 'Sem formatação programada'
+
+    if texto_saida[:indice] in eval(f'lista_padrao_{indice}'):
+        texto_saida = texto_saida.replace(texto_saida[:indice], f'{texto_saida[:indice]} ')
+        print(f'O código tratado é ::: {texto_saida}')
+        return texto_saida
+    
+    else:
+        print('dentro do else:')
+        indice+=1
+        return acerto_codigo_produto(codigo_produto, indice)
+
+
 def puxar_dados_api(codigo_produto, dados_necessarios=[]):
 
     token_manager = TokenGerador()
     api_cliente = APICliente(token_manager)
     filtro = JSONFilter()
+
+    # verificando se o json vem com os dados ou não e tratando o código com uma função dedicada
     response = api_cliente.obter_dados(codigo_produto)
     dados = response.json()
 
+    if dados['data'] == []:
+        codigo_produto = acerto_codigo_produto(codigo_produto)
+        response = api_cliente.obter_dados(codigo_produto)
+        dados = response.json()
+        
     if response:
         
         mapeamentos = {

@@ -50,6 +50,7 @@ class interface():
         messagebox.showwarning("Erro", "Você não digitou um código.")
         return None
     
+    
     def buscar_conteudo(self, codigo_produto):
         retorno = puxar_dados_api(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
         baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
