@@ -45,24 +45,23 @@ class interface():
     def ler_codigo_produto(self):
         
         codigo_produto = self.entrada_codigo.get()
+        codigo_produto = codigo_produto.upper()
         if codigo_produto:
             return codigo_produto
         messagebox.showwarning("Erro", "Você não digitou um código.")
         return None
-    
-    
+
+
     def buscar_conteudo(self, codigo_produto):
         retorno = puxar_dados_api(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
         baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
         return list(retorno.values())
-    
+
     def mostrar_imagem(self, codigo_produto):
         if codigo_produto:
             imagem = ImagemProduto(codigo_produto)
             imagem.mostrar_imagem(self.root)
         return None
-
-   
 
 # Inicializa a interface gráfica e executa o loop principal do Tkinter
 if __name__ == "__main__":
@@ -74,3 +73,4 @@ if __name__ == "__main__":
     root.maxsize(width=500, height=555)
     root.mainloop()
     ImagemProduto().limpar_imagens()
+    

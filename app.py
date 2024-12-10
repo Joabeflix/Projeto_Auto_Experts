@@ -136,7 +136,6 @@ def acerto_codigo_produto(codigo_produto, indice=2):
     print(indice)
 
     texto_saida = codigo_produto.replace(' ', '')
-    texto_saida = texto_saida.upper()
 
     print('Dentro do acerto')
     print(f'código atual é {texto_saida}')
@@ -232,12 +231,8 @@ def puxar_dados_api(codigo_produto, dados_necessarios=[]):
     return dict(lista_retorno)
 
 if __name__ == "__main__":
-#    cod = 'C-5682'
-#    url = exec(cod, ['imagem_url'])['imagem_url']
-#    print(url)
-    app = ImagemProduto('C-5682')
-    app.baixar_imagem()
-    app.mostrar_imagem()
-                
+    cod = 'C-5682'
+    url = puxar_dados_api(cod, ['nome', 'marca', 'aplicacao', 'ean', 'ncm', 'peso'])
+    print(type(url))
 
-                    
+                              
