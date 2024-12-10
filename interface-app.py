@@ -24,7 +24,9 @@ class interface():
 
         self.botao_imagem = ttk.Button(root, text="Ver imagem", width=13, command=lambda: self.mostrar_imagem(self.ler_codigo_produto()))
         self.botao_imagem.place(x=209, y=520)
+
     def inserir_texto(self, dados):
+        
         self.remover_texto('bloco_texto')
         linha = "-" * 78
         if dados:
