@@ -234,6 +234,5 @@ if __name__ == "__main__":
     cod = 'C-5682'
     url = puxar_dados_api(cod, ['nome', 'marca', 'aplicacao', 'ean', 'ncm', 'peso'])
     print(type(url))
-
-
+    print(type(list(url.values())))
 

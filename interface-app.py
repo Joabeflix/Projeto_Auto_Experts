@@ -16,8 +16,8 @@ class interface():
         self.entrada_codigo = ttk.Entry(root, width=30)
         self.entrada_codigo.place(x=150, y=30)
 
-        self.botao_inserir = ttk.Button(root, text="Pesquisar", width=9, command=lambda: self.inserir_texto(self.buscar_conteudo(self.ler_codigo_produto())))
-        self.botao_inserir.place(x=162, y=70)
+        self.botao_pesquisar = ttk.Button(root, text="Pesquisar", width=9, command=lambda: self.inserir_texto(self.buscar_conteudo(self.ler_codigo_produto())))
+        self.botao_pesquisar.place(x=162, y=70)
 
         self.botao_remover = ttk.Button(root, text="Limpar", width=9, command=self.remover_texto)
         self.botao_remover.place(x=253, y=70)
@@ -55,7 +55,7 @@ class interface():
     def buscar_conteudo(self, codigo_produto):
         retorno = puxar_dados_api(codigo_produto, ['nome', 'marca', 'aplicacao', 'peso'])
         baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
-        return list(retorno.values())
+        return retorno
 
     def mostrar_imagem(self, codigo_produto):
         if codigo_produto:
