@@ -8,6 +8,7 @@ class interface():
     def __init__(self, root):
         self.root = root
 
+        # Gerando a interface
         tk.Label(root, text='Código do produto').place(x=19, y=3)
         self.entrada_codigo = ttk.Entry(root, width=15)
         self.entrada_codigo.place(x=20, y=24)
@@ -15,6 +16,16 @@ class interface():
         self.botao_pesquisar = ttk.Button(root, text="Pesquisar", width=9, command=lambda: self.inserir_dados(self.buscar_conteudo(self.ler_codigo_produto())))
         self.botao_pesquisar.place(x=134, y=23)
 
+        self.botao_imagem = ttk.Button(root, text="Ver imagem", width=13, command=lambda: self.mostrar_imagem(self.ler_codigo_produto()))
+        self.botao_imagem.place(x=49, y=325)
+        
+        tk.Label(root, text='Produto').place(x=210, y=69)
+        self.entrada_nome = tk.Text(root, height=1, width=45)
+        self.entrada_nome.place(x=210, y=90)
+
+
+
+        # Criar os widgets Text dinamicamente
         # Lista para armazenar as referências dos widgets Text
         self.blocos_texto = []
 
@@ -22,38 +33,59 @@ class interface():
         self.y_inicial_caixas = 90
         self.y_inicial_label = 69
 
-        # Criar os widgets Text dinamicamente
-        self.nomes_labels = ['Nome', 'Marca', 'Ean', 'NCM', 'Peso']
-        for x in range(5):
+        # Esses nomes é os que vai gerar na interface
+        self.nomes_labels = ['Marca', 'Ean', 'NCM', 'Peso']
+
+        # Fazendo um looping de 5 e gerando 5 caixas de texto
+        # Após cada geração, aumentamos os pixels da variavél
+        # que usamos para os indices iniciais
+        # fazendo assim o looping gera a interface com os blocos
+        # um abaixo do outro
+
+        for x in range(4):
+
             tk.Label(text=self.nomes_labels[x]).place(x=18, y=self.y_inicial_label)
+
             self.bloco_texto = tk.Text(root, height=1, width=25)
             self.bloco_texto.place(x=20, y=self.y_inicial_caixas)
-            self.blocos_texto.append(self.bloco_texto)  # Armazena a referência na lista
+
+            # Armazena a referência na lista
+            self.blocos_texto.append(self.bloco_texto)
+
             self.y_inicial_caixas += 50
             self.y_inicial_label+=51
 
-        self.bloco_texto_aplicacao = tk.Text(root, height=14, width=45)
-        self.bloco_texto_aplicacao.place(x=210, y=90)
+        tk.Label(root, text='Aplicação').place(x=212, y=120)
+        self.bloco_texto_aplicacao = tk.Text(root, height=8, width=45)
+        self.bloco_texto_aplicacao.place(x=210, y=140)
+
+
 
     # Função para inserir dados nos blocos
     def inserir_dados(self, lista_de_dados={}):
 
         indice = 0
-        sequencia = ['nome', 'marca', 'ean', 'ncm', 'peso', 'aplicacao']
+        sequencia = ['marca', 'ean', 'ncm', 'peso']
 
         # Inserindo dados nas linhas
         for i, bloco in enumerate(self.blocos_texto):
             bloco.delete("1.0", "end")  # Limpa o conteúdo existente
             bloco.insert("1.0", f"{lista_de_dados.get(sequencia[indice])}")  # Insere o novo conteúdo
             indice+=1
-        # Inserindo dados na caixa de aplicação que é feita fora do looping
+
+        # Inserindo dados na caixa de aplicação e nome que é feita fora do looping
+        self.entrada_nome.delete("1.0", "end")
+        self.bloco_texto_aplicacao.delete("1.0", "end")
+        self.entrada_nome.insert("1.0", f"{lista_de_dados.get('nome')}")
         self.bloco_texto_aplicacao.insert("1.0", f"{lista_de_dados.get('aplicacao')}")
 
-
+    # Função para ler o código do produto na interface
+    # Ela também informa caso o usuário não escreva um código
     def ler_codigo_produto(self):
         
         codigo_produto = self.entrada_codigo.get()
         codigo_produto = codigo_produto.upper()
+
         if codigo_produto:
             return codigo_produto
         messagebox.showwarning("Erro", "Você não digitou um código.")
@@ -63,9 +95,6 @@ class interface():
     def buscar_conteudo(self, codigo_produto):
         retorno = puxar_dados_api(codigo_produto, ['nome', 'marca', 'ean', 'ncm', 'peso', 'aplicacao', ])
         baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
-        print('Dentro de buscar conteúdo')
-        print(f'conteúdo: {retorno}')
-        print(f'type conteúdo: {type(retorno)}')
         return retorno
 
     def mostrar_imagem(self, codigo_produto):
