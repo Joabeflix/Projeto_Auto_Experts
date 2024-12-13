@@ -23,6 +23,9 @@ class interface():
         self.entrada_nome = tk.Text(root, height=1, width=45)
         self.entrada_nome.place(x=210, y=90)
 
+        self.botao_funcao_exel = ttk.Button(root, text="Via Exel", width=13, command=lambda: self.interface_via_exel())
+        self.botao_funcao_exel.place(x=300, y=325)
+
 
 
         # Criar os widgets Text dinamicamente
@@ -91,7 +94,6 @@ class interface():
         messagebox.showwarning("Erro", "Você não digitou um código.")
         return None
 
-
     def buscar_conteudo(self, codigo_produto):
         retorno = puxar_dados_api(codigo_produto, ['nome', 'marca', 'ean', 'ncm', 'peso', 'aplicacao', ])
         baixar_imagem = ImagemProduto(codigo_produto).baixar_imagem()
@@ -102,6 +104,30 @@ class interface():
             imagem = ImagemProduto(codigo_produto)
             imagem.mostrar_imagem(self.root)
         return None
+    
+    def interface_via_exel(self):
+        root = tk.Tk()
+        root.title("Via Exel")
+        root.geometry('250x150')
+        self.entrada_caminho_pasta = tk.Entry(root, width=35)
+        self.entrada_caminho_pasta.place(x=15, y=50)
+
+
+
+
+
+
+
+
+
+
+
+
+
+        root.mainloop()
+
+
+
 
 # Inicializa a interface gráfica e executa o loop principal do Tkinter
 if __name__ == "__main__":
