@@ -129,20 +129,7 @@ class interface():
             print(pasta.name)
             self.entrada_caminho_pasta.insert(0, pasta.name)
 
-
-
-
-
-
-
-
-
-
-
         root.mainloop()
-
-
-
 
 # Inicializa a interface gráfica e executa o loop principal do Tkinter
 if __name__ == "__main__":
