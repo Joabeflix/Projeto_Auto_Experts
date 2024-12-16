@@ -109,6 +109,13 @@ class interface():
     def fechar_aba_tkinter(self):
         root.destroy()
     
+    def esconder_janela(self):
+        root.withdraw()
+
+    def restaurar_janela(self):
+        root.deiconify()
+
+
 
     def interface_via_exel(self):
 
