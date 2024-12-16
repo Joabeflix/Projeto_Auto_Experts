@@ -2,6 +2,7 @@ from app import puxar_dados_api
 from app import ImagemProduto
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import filedialog
 import ttkbootstrap as ttk
 
 class interface():
@@ -104,15 +105,29 @@ class interface():
             imagem = ImagemProduto(codigo_produto)
             imagem.mostrar_imagem(self.root)
         return None
+
+    def fechar_aba_tkinter(self):
+        root.destroy()
     
+
     def interface_via_exel(self):
-        root = tk.Tk()
-        root.title("Via Exel")
-        root.geometry('250x150')
-        self.entrada_caminho_pasta = tk.Entry(root, width=35)
+
+        self.fechar_aba_tkinter()
+            
+
+        root_exel = tk.Tk()
+        root_exel.title("Via Exel")
+        root_exel.geometry('450x300')
+        self.entrada_caminho_pasta = tk.Entry(root_exel, width=35)
         self.entrada_caminho_pasta.place(x=15, y=50)
+        self.botao_selecionar_arquivo = tk.Button(root_exel, text="Selecionar", width=10, command=lambda: selecionar_pasta_e_inserir())
+        self.botao_selecionar_arquivo.place(x=280, y=50)
 
-
+        def selecionar_pasta_e_inserir():
+            pasta = filedialog.askopenfile()
+            print('Essa é o valor que vai atribuir para a variável "PASTA"')
+            print(pasta.name)
+            self.entrada_caminho_pasta.insert(0, pasta.name)
 
 
 
