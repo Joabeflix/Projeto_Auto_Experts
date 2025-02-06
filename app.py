@@ -3,6 +3,9 @@ import json
 import os
 import tkinter as tk
 from PIL import Image, ImageTk
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class TokenGerador:
     def __init__(self):
@@ -18,6 +21,7 @@ class TokenGerador:
             'clientKey': self.CLIENT_KEY,
             'clientSecret': self.CLIENT_SECRET
         }
+        print(f'Arquivo enviado: {token_payload}')
         token_response = requests.post(token_url, json=token_payload)
         if token_response.status_code == 200:
             return token_response.json().get('accessToken')
