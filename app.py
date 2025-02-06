@@ -43,9 +43,9 @@ class TokenGerador:
             self.ler_txt_token()
 
 class APICliente:
+    
     BASE_URL = 'https://api.intelliauto.com.br/v1/produtos/partnumber/'
-    
-    
+
     def __init__(self, token_manager):
         self.token_manager = token_manager
 
