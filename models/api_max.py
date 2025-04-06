@@ -11,6 +11,7 @@ class TokenGerador:
     def __init__(self):
         pass
 
+
     CLIENT_KEY=os.getenv('CLIENT_KEY')
     CLIENT_SECRET=os.getenv('CLIENT_SECRET')
  
