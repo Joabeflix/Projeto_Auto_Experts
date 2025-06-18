@@ -3,4 +3,6 @@
 /venv_backup/
 *.txt
 __pycache__
+*.xlsx
+*.jpg
 

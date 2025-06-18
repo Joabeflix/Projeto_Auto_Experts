@@ -3,6 +3,7 @@ import numpy as np
 import os
 from tkinter import messagebox
 import re
+from utils.mapeamento_palavras_substituir import MAPEAMENTO_SUBSTITUICOES_NOME_ANUNCIOS
 
 def texto_no_console(obj):
     separadores = ['_', '*', '-', '#']
@@ -75,3 +76,68 @@ def converter_int64_para_int(obj):
 
 def limpar_prompt():
     os.system('cls')
+
+
+
+def deixar_nome_ate_60_caracteres(nome_produto, codigo_produto, marca):
+
+    palavras_para_substituir = MAPEAMENTO_SUBSTITUICOES_NOME_ANUNCIOS
+
+    def acertar_nomes(x):
+        return str(x).upper().replace("  ", " ")
+    
+    def verificar_tamanho(nome):
+        return True if len(nome) < 61 else False
+    
+    def retorno_final(x):
+        return x.title().rstrip().replace("///", "").replace("//", "").replace("   ", " ").replace("  ", " ")
+    
+    nome_produto = acertar_nomes(nome_produto)
+    codigo_produto = acertar_nomes(codigo_produto)
+    marca = acertar_nomes(marca)
+    
+    nome_novo = nome_produto.replace("  ", " ")
+
+    if verificar_tamanho(nome_novo):
+        return retorno_final(nome_novo)
+    
+    nome_novo = nome_novo.replace(codigo_produto, "")
+    nome_novo = nome_novo.replace("  ", " ")
+
+    if verificar_tamanho(nome_novo):
+        return retorno_final(nome_novo)
+    
+    nome_novo = nome_novo.replace(marca, "")
+    nome_novo = nome_novo.replace("  ", " ")
+
+    if verificar_tamanho(nome_novo):
+        return retorno_final(nome_novo)
+    
+    for palavra in palavras_para_substituir:
+        if palavra not in nome_novo:
+            continue
+        if verificar_tamanho(nome_novo):
+            return retorno_final(nome_novo)
+        nome_novo = nome_novo.replace(palavra, palavras_para_substituir.get(palavra))
+
+    if verificar_tamanho(nome_novo):
+        return retorno_final(nome_novo)
+    
+
+    def remover_conteudo_parenteses(texto):
+        """
+        Função para remover dados que temos entre parentezes dos nomes... ex: 
+        "Amortecedor De Suspensão Compatível Puma 7900 (Serie 10 / X10) 1981-2005 Diant / Tras"
+        vira:
+        "Amortecedor De Suspensão Compatível Puma 7900 981-2005 Diant / Tras"
+        """
+        return re.sub(r"\([^)]*\)", "", texto)
+
+    nome_novo = remover_conteudo_parenteses(nome_novo)
+
+    return retorno_final(nome_novo)
+
+if __name__ == "__main__":
+    x = deixar_nome_ate_60_caracteres('Amortecedor De Suspensão Compatível Volkswagen Gol 1.0 16V/1.0 8V/1.6 8V 1981-2016 Dianteiro Direito / Esquerdo Nakata Hg 31073', 'HG 31073', 'NAKATA')
+    print(x)
+    print(len(x))

@@ -111,9 +111,6 @@ def mapeamento_usar(chave):
     return False
 
 
-
-
-
 if __name__ == "__main__":
     print(mapeamento_usar('peso'))
 

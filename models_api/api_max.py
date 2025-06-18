@@ -4,8 +4,8 @@ import os
 import tkinter as tk
 from PIL import Image, ImageTk
 from dotenv import load_dotenv
-from models.gerar_token import TokenGerador
-from models.mapeamentos import mapeamento_usar
+from models_api.gerar_token import TokenGerador
+from models_api.mapeamentos import mapeamento_usar
 
 load_dotenv()
 
@@ -75,5 +75,5 @@ if __name__ == "__main__":
 
     acces_token = TokenGerador().ler_token()
     codigo_produuto = 'HG 31006'
-    dados = ['nome', 'lado', 'ativo_catalogo', 'status', 'inclui_pivo']
+    dados = ['nome', 'grupo_produto']
     print(puxar_dados_api(access_token=acces_token, codigo_produto=codigo_produuto, dados_necessarios=dados))
