@@ -27,7 +27,7 @@ class MinhaInterface:
     def __init__(self):
         self.root = ttk.Window(themename="darkly")
         self.root.title("Interface -- XWP")
-        self.root.geometry("913x950")
+        self.root.geometry("1166x733")
 
         """ Entrys """
         self.entrada_planilha = ttk.Entry(self.root, width=45)
@@ -35,11 +35,17 @@ class MinhaInterface:
 
         """ CheckButtons"""
         self.baixar_imagem = tk.BooleanVar(value=True)
-        self.escolher_baixar_imagem = ttk.Checkbutton(self.root, variable=self.baixar_imagem, text='baixar imagens',  style='square-toggle')
+        def printar_status_escolher_imagem():
+            if self.baixar_imagem.get():
+                texto_no_console('Baixar imagens ativado.')
+                return None
+            texto_no_console('Baixar imagens desativado.')
+
+        self.escolher_baixar_imagem = ttk.Checkbutton(self.root, variable=self.baixar_imagem, text='baixar imagens',  style='square-toggle', command=lambda: printar_status_escolher_imagem())
         self.escolher_baixar_imagem.place(x=572, y=66)
 
         """ Labels """
-        self.label_console = ttk.Label(self.root, text="Informações:", font=("Segoe UI", 17, "bold"), foreground="blue")
+        self.label_console = ttk.Label(self.root, text="Informações:", font=("Segoe UI", 17, "bold"), foreground="white")
         self.label_console.place(x=10, y=107)
 
 
@@ -55,7 +61,7 @@ class MinhaInterface:
 
         """ Outros """
 
-        self.console = ScrolledText(self.root, width=85, height=30, wrap=tk.WORD)
+        self.console = ScrolledText(self.root, width=85, height=20, wrap=tk.WORD, font=("Arial", 12))
         self.console.place(x=10, y=165)
         sys.stdout = RedirecionarConsole(self.console)
 
@@ -66,8 +72,7 @@ class MinhaInterface:
             texto_no_console(f'Arquivo selecionado com sucesso: {arquivo}\n')
             self.entrada_planilha.delete(0, tk.END)
             self.entrada_planilha.insert(0, arquivo)
-        else:
-
+        else:   
             texto_no_console('Nenhum arquivo selecionado.\n')
 
     def gerar_anuncios_thread(self):
@@ -85,6 +90,7 @@ class MinhaInterface:
 
     def iniciar(self):
         self.root.mainloop()
+        texto_no_console('Programa iniciado com sucesso.')
 
 if __name__ == "__main__":
     app = MinhaInterface()
