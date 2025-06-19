@@ -3,12 +3,19 @@ from utils.utils import texto_no_console, deixar_nome_ate_60_caracteres
 from models_api.api_max import puxar_dados_api
 from models_api.gerar_token import TokenGerador
 import requests
+import re
 
 class Gerar_Anuncios:
     def __init__(self, acces_token, planilha, baixar_img=True):
         self.acces_token=acces_token
         self.planilha=planilha
         self.baixar_img=baixar_img
+
+    def extrair_primeira_data(self, veiculo):
+        match = re.search(r'\b(19|20)\d{2}-(19|20)\d{2}\b', veiculo)
+        if match:
+            return veiculo[:match.end()]  # Retorna até o fim da data encontrada
+        return veiculo  # Se não achar, retorna o texto original
 
 
     def gerar_planilha(self):
@@ -25,7 +32,6 @@ class Gerar_Anuncios:
         for cod in coluna_codigo:
             dados_puxar = ['nome', 'grupo_produto', 'aplicacao', 'marca', 'part_number', 'ean', 'posicao', 'lado', 'imagem_url', 'similares']
             dados_anuncio = puxar_dados_api(self.acces_token, codigo_produto=cod, dados_necessarios=dados_puxar)
-            print(f'DADOS {dados_anuncio}')
             if not dados_anuncio:
                 coluna_nome_anuncio.append('Não encontrado API')
                 coluna_ean.append('Não encontrado API')
@@ -42,7 +48,7 @@ class Gerar_Anuncios:
             marca = dados_anuncio['marca']
             codigo_produto = dados_anuncio['part_number']
 
-            _nome_anuncio = f'{nome_produto} Compatível {veiculo[:veiculo.find('-')+5]} {posicao} {lado} {marca} {codigo_produto}'.title()
+            _nome_anuncio = f'{nome_produto} Compatível {self.extrair_primeira_data(veiculo)} {posicao} {lado} {marca} {codigo_produto}'.title()
             nome_anuncio = " ".join(_nome_anuncio.replace('None', ' ').split()).title()
 
             nome_ate_60 = deixar_nome_ate_60_caracteres(nome_anuncio, codigo_produto, marca)
@@ -62,9 +68,11 @@ Compatível com os veículos:
             """
             coluna_descricao_completa.append(aplicacao_anuncio_feita)
 
-
-            if self.baixar_img:
-                self.baixar_imagem(url=dados_anuncio['imagem_url'], nome_arquivo=codigo_produto)
+            try:
+                if self.baixar_img:
+                    self.baixar_imagem(url=dados_anuncio['imagem_url'], nome_arquivo=codigo_produto)
+            except:
+                continue
         
         planilha['nome anuncio completo'] = coluna_nome_anuncio
         planilha['nome anuncio < 60'] = coluna_nome_ate_60
@@ -81,15 +89,15 @@ Compatível com os veículos:
             if resposta.status_code == 200:
                 with open(f'{nome_arquivo}.jpg', 'wb') as f:
                     f.write(resposta.content)
-                print(f"Imagem salva como: {nome_arquivo}")
+                texto_no_console(f"Imagem salva como: {nome_arquivo}")
             else:
-                print(f"Erro ao baixar imagem. Código HTTP: {resposta.status_code}")
+                texto_no_console(f"Erro ao baixar imagem. Código HTTP: {resposta.status_code}")
         except Exception as e:
-            print(f"Erro: {e}")
+            texto_no_console(f"Código: {nome_arquivo} --> provavelmente não tem imagem disponível na API.")
 
 
 def teste():
-    print('teste teste ')
+    texto_no_console('teste teste ')
 
 
 if __name__ == "__main__":

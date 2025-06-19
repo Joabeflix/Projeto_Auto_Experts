@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 from dotenv import load_dotenv
 from models_api.gerar_token import TokenGerador
 from models_api.mapeamentos import mapeamento_usar
-
+from utils.utils import texto_no_console
 load_dotenv()
 
 
@@ -35,7 +35,7 @@ class FiltroJSON:
         try:
             retorno = eval(f"data{filtro_json}")
         except Exception as e:
-            print(f"Erro ao acessar dados com o filtro: {e}")
+            texto_no_console(f"Erro ao acessar dados com o filtro: {e}")
             return f""
         if item_filtro:
             try:
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     acces_token = TokenGerador().ler_token()
     codigo_produuto = 'HG 31006'
     dados = ['nome', 'grupo_produto']
-    print(puxar_dados_api(access_token=acces_token, codigo_produto=codigo_produuto, dados_necessarios=dados))
+    texto_no_console(puxar_dados_api(access_token=acces_token, codigo_produto=codigo_produuto, dados_necessarios=dados))

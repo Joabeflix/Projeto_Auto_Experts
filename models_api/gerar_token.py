@@ -48,4 +48,4 @@ class TokenGerador:
 
 if __name__ == "__main__":
     app = TokenGerador()
-    print(app.ler_token())
+    texto_no_console(app.ler_token())
