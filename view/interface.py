@@ -37,9 +37,9 @@ class MinhaInterface:
         self.baixar_imagem = tk.BooleanVar(value=True)
         def printar_status_escolher_imagem():
             if self.baixar_imagem.get():
-                texto_no_console('Baixar imagens ativado.')
+                texto_no_console('Baixar imagens (ATIVADO).')
             else:
-                texto_no_console('Baixar imagens desativado.')
+                texto_no_console('Baixar imagens (DESATIVADO).')
 
         self.escolher_baixar_imagem = ttk.Checkbutton(
             self.root,
@@ -52,7 +52,7 @@ class MinhaInterface:
 
         """ Labels """
         self.label_console = ttk.Label(self.root, text="Informações:", font=("Segoe UI", 17, "bold"), foreground="white")
-        self.label_console.place(x=10, y=47)
+        self.label_console.place(x=10, y=42)
 
         """ Buttons """
         self.botao_selecionar_excel = ttk.Button(
@@ -80,10 +80,10 @@ class MinhaInterface:
             metertype="semi",
             subtext="Progresso Total",
             interactive=False,
-            bootstyle="info",
+            bootstyle="success",
             stripethickness=3
         )
-        self.meter_geral.place(x=850, y=84)  # posição no canto superior direito
+        self.meter_geral.place(x=850, y=109)  # posição no canto superior direito
 
 
         """ Medidor de Progresso (NOVO) """
@@ -95,10 +95,10 @@ class MinhaInterface:
             metertype="semi",
             subtext="Progresso Anúncio",
             interactive=False,
-            bootstyle="info",
+            bootstyle="secondary",
             stripethickness=3
         )
-        self.meter_anuncio.place(x=850, y=300)  # posição no canto superior direito
+        self.meter_anuncio.place(x=850, y=275)  # posição no canto superior direito
 
         """ Console """
         self.console = ScrolledText(self.root, width=85, height=20, wrap=tk.WORD, font=("Arial", 12))

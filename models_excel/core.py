@@ -13,6 +13,7 @@ class Gerar_Anuncios:
         self.baixar_img=baixar_img
         self.atualizar_barra_geral=atualizar_barra_geral
         self.atualizar_barra_anuncio=atualizar_barra_anuncio
+    
 
     def extrair_primeira_data(self, veiculo):
         match = re.search(r'\b(19|20)\d{2}-(19|20)\d{2}\b', veiculo)
@@ -22,6 +23,7 @@ class Gerar_Anuncios:
 
     @medir_tempo_execucao
     def gerar_planilha(self):
+        self.atualizar_barra_geral(0)
         planilha = pd.read_excel(self.planilha)
         coluna_codigo = planilha['Cod Produto']
         qtd_produtos = len(coluna_codigo)
