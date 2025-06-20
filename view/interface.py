@@ -27,7 +27,7 @@ class MinhaInterface:
     def __init__(self):
         self.root = ttk.Window(themename="darkly")
         self.root.title("Interface -- XWP")
-        self.root.geometry("1166x733")
+        self.root.geometry("815x550")
 
         """ Entrys """
         self.entrada_planilha = ttk.Entry(self.root, width=45)
@@ -42,7 +42,7 @@ class MinhaInterface:
             texto_no_console('Baixar imagens desativado.')
 
         self.escolher_baixar_imagem = ttk.Checkbutton(self.root, variable=self.baixar_imagem, text='baixar imagens',  style='square-toggle', command=lambda: printar_status_escolher_imagem())
-        self.escolher_baixar_imagem.place(x=572, y=66)
+        self.escolher_baixar_imagem.place(x=360, y=66)
 
         """ Labels """
         self.label_console = ttk.Label(self.root, text="Informações:", font=("Segoe UI", 17, "bold"), foreground="white")
@@ -54,7 +54,7 @@ class MinhaInterface:
         self.botao_selecionar_excel = ttk.Button(self.root, text='Selecionar Excel', command=self.selecionar_arquivos_excel, style='success-outline')
         self.botao_selecionar_excel.place(x=10, y=10)
         self.botao_gerar_planilha = ttk.Button(self.root, text='Gerar', style='success', command=lambda: self.gerar_anuncios_thread())
-        self.botao_gerar_planilha.place(x=485, y=60)
+        self.botao_gerar_planilha.place(x=303, y=60)
 
 
 

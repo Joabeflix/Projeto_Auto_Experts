@@ -4,6 +4,7 @@ import requests
 import json
 from utils.utils import *
 
+
 load_dotenv()
 
 class TokenGerador:

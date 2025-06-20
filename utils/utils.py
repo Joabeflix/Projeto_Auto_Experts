@@ -4,11 +4,12 @@ import os
 from tkinter import messagebox
 import re
 from utils.mapeamento_palavras_substituir import MAPEAMENTO_SUBSTITUICOES_NOME_ANUNCIOS
+import time
 
 def texto_no_console(obj):
     separadores = ['_', '*', '-', '#']
     if obj in separadores:
-        print(obj * 30)
+        print(obj * 120)
         return None
     if isinstance(obj, list):
         for t in obj:
@@ -137,7 +138,24 @@ def deixar_nome_ate_60_caracteres(nome_produto, codigo_produto, marca):
 
     return retorno_final(nome_novo)
 
+
+def medir_tempo_execucao(funcao):
+    def wrapper(*args, **kwargs):
+        inicio = time.perf_counter()
+        resultado = funcao(*args, **kwargs)
+        fim = time.perf_counter()
+        texto_no_console(f"Tempo de demorado: {fim - inicio:.2f} segundos:")
+        return resultado
+    return wrapper
+
+        
+
 if __name__ == "__main__":
-    x = deixar_nome_ate_60_caracteres('Amortecedor De Suspensão Compatível Volkswagen Gol 1.0 16V/1.0 8V/1.6 8V 1981-2016 Dianteiro Direito / Esquerdo Nakata Hg 31073', 'HG 31073', 'NAKATA')
-    print(x)
-    print(len(x))
+    @medir_tempo_execucao
+    def minha_funcao():
+        time.sleep(2)
+        print("Função finalizada.")
+
+    minha_funcao()
+    
+

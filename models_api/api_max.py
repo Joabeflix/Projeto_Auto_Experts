@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from utils.utils import texto_no_console
 from models_api.gerar_token import TokenGerador
 from models_api.mapeamentos import mapeamento_usar
+import time
 
 load_dotenv()
 
@@ -101,6 +102,8 @@ def puxar_dados_veiculos_api(access_token, lista_veiculos):
     veiculos_completos = []
 
     for item in lista_veiculos:
+        # Um time pequeno para evitar requisições muito rápidas
+        time.sleep(0.05)
         codigo = item.get('codigo')
         if not codigo:
             continue
@@ -150,10 +153,5 @@ def puxar_dados_veiculos_api(access_token, lista_veiculos):
 
 if __name__ == "__main__":
     access_token = TokenGerador().ler_token()
-    dados_gerais = puxar_dados_produto_api(access_token=access_token, codigo_produto='C-2044', dados_necessarios=['veiculos'])
-    lista_veiculos = dados_gerais['veiculos']
-
-    dados_completos = puxar_dados_veiculos_api(access_token, lista_veiculos)
-
-    for v in dados_completos:
-        texto_no_console(v)
+    dados_gerais = puxar_dados_produto_api(access_token=access_token, codigo_produto='C-2044', dados_necessarios=['json_completo'])
+    print(dados_gerais)

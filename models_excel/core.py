@@ -1,9 +1,10 @@
 import pandas as pd
-from utils.utils import texto_no_console, deixar_nome_ate_60_caracteres, tela_aviso
+from utils.utils import texto_no_console, deixar_nome_ate_60_caracteres, tela_aviso, medir_tempo_execucao
 from models_api.api_max import puxar_dados_produto_api, puxar_dados_veiculos_api
 from models_api.gerar_token import TokenGerador
 import requests
 import re
+from models_excel.padroes_substituir_nomes_anuncios import  PADROES
 
 class Gerar_Anuncios:
     def __init__(self, acces_token, planilha, baixar_img=True):
@@ -17,7 +18,7 @@ class Gerar_Anuncios:
             return veiculo[:match.end()]  # Retorna até o fim da data encontrada
         return veiculo  # Se não achar, retorna o texto original
 
-
+    @medir_tempo_execucao
     def gerar_planilha(self):
         planilha = pd.read_excel(self.planilha)
         coluna_codigo = planilha['Cod Produto']
@@ -39,17 +40,25 @@ class Gerar_Anuncios:
             'imagem_url', 'veiculos'
         ]
 
-        qtd_produtos_decrescer = qtd_produtos
+        qtd_feita = 1
         for cod in coluna_codigo:
-            texto_no_console(f'Falta {qtd_produtos_decrescer}/{qtd_produtos}')
             dados_anuncio = puxar_dados_produto_api(self.acces_token, codigo_produto=cod, dados_necessarios=dados_puxar)
 
             if not dados_anuncio:
                 for coluna in [coluna_nome_anuncio, coluna_ean, coluna_nome_ate_60, coluna_descricao_completa, coluna_posicao, coluna_lado]:
                     coluna.append('Não encontrado API')
                 continue
-                
-            nome_produto = dados_anuncio['grupo_produto']
+            
+
+            # Vamos passar o nome do produto em uma verificação para ver se tem
+            # um padrao de substituição cadastrado...
+            nome_produto_api = dados_anuncio['grupo_produto']
+            nome_produto = self.verificar_e_substituir_nome_padrao(nome_produto_api)
+            ############################################################################
+
+
+
+
             veiculo_titulo = dados_anuncio['aplicacao']
             posicao = dados_anuncio['posicao']
             lado = dados_anuncio['lado']
@@ -105,7 +114,9 @@ class Gerar_Anuncios:
                     self.baixar_imagem(url=dados_anuncio['imagem_url'], nome_arquivo=codigo_produto)
             except:
                 continue
-            qtd_produtos_decrescer-=1
+            texto_no_console(f'Feito: {qtd_feita}/{qtd_produtos}')
+            texto_no_console('-')
+            qtd_feita+=1
         
         planilha['nome anuncio completo'] = coluna_nome_anuncio
         planilha['nome anuncio < 60'] = coluna_nome_ate_60
@@ -133,6 +144,12 @@ class Gerar_Anuncios:
         except Exception as e:
             texto_no_console(f"Código: {nome_arquivo} --> provavelmente não tem imagem disponível na API.")
 
+
+    def verificar_e_substituir_nome_padrao(self, nome_padrao):
+        nome_padrao = str(nome_padrao).lower()
+        # Se o nome padão nao tiver no dicionario o .get ja retorna o nome padrao passado no input
+        # Por isso passamos nome_padrao 2 vezes no argumento, por q o outro é o retorno quando não existe a chave
+        return PADROES.get(nome_padrao, nome_padrao)
 
 def teste():
     texto_no_console('teste teste ')
