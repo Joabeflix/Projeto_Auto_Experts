@@ -136,9 +136,7 @@ class Gerar_Anuncios:
 
         planilha.to_excel('anuncios.xlsx', index=False)
         texto_no_console('Planilha de anúncios gerada com sucesso!')
-        tela_aviso('Planilha finalizada', 'A planilha foi gerada com sucesso.', 'informacao')
-
-
+        
 
         def baixar_imagem(self, url, nome_arquivo):
             texto_no_console(f'Baixando imagem {nome_arquivo}.')

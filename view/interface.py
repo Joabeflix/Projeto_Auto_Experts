@@ -141,6 +141,7 @@ class MinhaInterface:
                   # Passa função para uso interno
             )
             app.gerar_planilha()
+            tela_aviso('Planilha finalizada', 'A planilha foi gerada com sucesso.', 'informacao')
             self.atualizar_progresso_geral(100)  # Garante que termina em 100%
             self.atualizar_progresso_anuncio_atual(100)
         else:
