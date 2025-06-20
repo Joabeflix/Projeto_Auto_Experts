@@ -83,7 +83,7 @@ class MinhaInterface:
             bootstyle="success",
             stripethickness=3
         )
-        self.meter_geral.place(x=850, y=109)  # posição no canto superior direito
+        self.meter_geral.place(x=850, y=109)
 
 
         """ Medidor de Progresso (NOVO) """
@@ -98,7 +98,7 @@ class MinhaInterface:
             bootstyle="secondary",
             stripethickness=3
         )
-        self.meter_anuncio.place(x=850, y=275)  # posição no canto superior direito
+        self.meter_anuncio.place(x=850, y=275)
 
         """ Console """
         self.console = ScrolledText(self.root, width=85, height=20, wrap=tk.WORD, font=("Arial", 12))
