@@ -7,10 +7,12 @@ import re
 from models_excel.padroes_substituir_nomes_anuncios import  PADROES
 
 class Gerar_Anuncios:
-    def __init__(self, acces_token, planilha, baixar_img=True):
+    def __init__(self, acces_token, planilha, atualizar_barra_geral, atualizar_barra_anuncio, baixar_img=True):
         self.acces_token=acces_token
         self.planilha=planilha
         self.baixar_img=baixar_img
+        self.atualizar_barra_geral=atualizar_barra_geral
+        self.atualizar_barra_anuncio=atualizar_barra_anuncio
 
     def extrair_primeira_data(self, veiculo):
         match = re.search(r'\b(19|20)\d{2}-(19|20)\d{2}\b', veiculo)
@@ -24,7 +26,8 @@ class Gerar_Anuncios:
         coluna_codigo = planilha['Cod Produto']
         qtd_produtos = len(coluna_codigo)
         texto_no_console(f'Total de produtos para criar anúncio: {qtd_produtos}')
-        # colunas
+
+        # Colunas de saída
         coluna_nome_anuncio = []
         coluna_ean = []
         coluna_nome_ate_60 = []
@@ -32,7 +35,6 @@ class Gerar_Anuncios:
         coluna_descricao_simplificada = []
         coluna_posicao = []
         coluna_lado = []
-
 
         dados_puxar = [
             'nome', 'grupo_produto', 'aplicacao', 'marca',
@@ -47,17 +49,11 @@ class Gerar_Anuncios:
             if not dados_anuncio:
                 for coluna in [coluna_nome_anuncio, coluna_ean, coluna_nome_ate_60, coluna_descricao_completa, coluna_posicao, coluna_lado]:
                     coluna.append('Não encontrado API')
+                qtd_feita += 1
                 continue
-            
 
-            # Vamos passar o nome do produto em uma verificação para ver se tem
-            # um padrao de substituição cadastrado...
             nome_produto_api = dados_anuncio['grupo_produto']
             nome_produto = self.verificar_e_substituir_nome_padrao(nome_produto_api)
-            ############################################################################
-
-
-
 
             veiculo_titulo = dados_anuncio['aplicacao']
             posicao = dados_anuncio['posicao']
@@ -79,8 +75,12 @@ class Gerar_Anuncios:
             coluna_lado.append(lado)
 
             def gerar_aplicacao_veiculo():
-                texto_no_console(f'Gerando aplicação do código {dados_anuncio['part_number']}')
-                lista_veiculos = puxar_dados_veiculos_api(access_token=self.acces_token, lista_veiculos=dados_anuncio['veiculos'])
+                texto_no_console(f'Gerando aplicação do código {dados_anuncio["part_number"]}')
+                lista_veiculos = puxar_dados_veiculos_api(
+                    access_token=self.acces_token,
+                    lista_veiculos=dados_anuncio['veiculos'],
+                    atualizar_barra_anuncio=self.atualizar_barra_anuncio
+                )
                 parte_de_cima_aplicacao = f"Produto: {dados_anuncio['nome']}\nMarca: {dados_anuncio['marca']}\nCódigo Produto: {dados_anuncio['part_number']}\n\nCompatível com os veículos:\n"
                 linhas_aplicacao = []
                 for veiculo in lista_veiculos:
@@ -94,11 +94,10 @@ class Gerar_Anuncios:
                         cilindrada = motorizacao.get('cilindrada', '')
                         configuracao = motorizacao.get('configuracao', '')
                         potencia = motorizacao.get('potenciaCv', '')
-
                         anos_formatado = f"{min(anos)} a {max(anos)}" if anos else "Ano não disponível"
-
                         linha = f"{marca} {nome} {modelo} {anos_formatado} - Motor: {motor_nome} {cilindrada}cc {configuracao} {potencia}cv"
                         linhas_aplicacao.append(linha.strip())
+
                     except Exception as e:
                         texto_no_console(f"Erro ao montar aplicação para veículo: {e}")
                 texto_no_console('Aplicação montada com sucesso!')
@@ -113,11 +112,18 @@ class Gerar_Anuncios:
                 if self.baixar_img:
                     self.baixar_imagem(url=dados_anuncio['imagem_url'], nome_arquivo=codigo_produto)
             except:
-                continue
+                pass
+
             texto_no_console(f'Feito: {qtd_feita}/{qtd_produtos}')
             texto_no_console('-')
-            qtd_feita+=1
-        
+
+            # ⏫ Atualiza o progresso (se a função estiver disponível)
+            if self.atualizar_barra_geral:
+                progresso = int((qtd_feita / qtd_produtos) * 100)
+                self.atualizar_barra_geral(progresso)
+
+            qtd_feita += 1
+
         planilha['nome anuncio completo'] = coluna_nome_anuncio
         planilha['nome anuncio < 60'] = coluna_nome_ate_60
         planilha['ean'] = coluna_ean
@@ -126,23 +132,24 @@ class Gerar_Anuncios:
         planilha['posicao'] = ["" if x == 'None' else x for x in coluna_posicao]
         planilha['lado'] = ["" if x == 'None' else x for x in coluna_lado]
 
-        salvar = planilha.to_excel('anuncios.xlsx', index=False)
+        planilha.to_excel('anuncios.xlsx', index=False)
         texto_no_console('Planilha de anúncios gerada com sucesso!')
         tela_aviso('Planilha finalizada', 'A planilha foi gerada com sucesso.', 'informacao')
 
 
-    def baixar_imagem(self, url, nome_arquivo):
-        texto_no_console(f'Baixando imagem {nome_arquivo}.')
-        try:
-            resposta = requests.get(url)
-            if resposta.status_code == 200:
-                with open(f'{nome_arquivo}.jpg', 'wb') as f:
-                    f.write(resposta.content)
-                texto_no_console(f"Imagem salva como: {nome_arquivo}")
-            else:
-                texto_no_console(f"Erro ao baixar imagem. Código HTTP: {resposta.status_code}")
-        except Exception as e:
-            texto_no_console(f"Código: {nome_arquivo} --> provavelmente não tem imagem disponível na API.")
+
+        def baixar_imagem(self, url, nome_arquivo):
+            texto_no_console(f'Baixando imagem {nome_arquivo}.')
+            try:
+                resposta = requests.get(url)
+                if resposta.status_code == 200:
+                    with open(f'{nome_arquivo}.jpg', 'wb') as f:
+                        f.write(resposta.content)
+                    texto_no_console(f"Imagem salva como: {nome_arquivo}")
+                else:
+                    texto_no_console(f"Erro ao baixar imagem. Código HTTP: {resposta.status_code}")
+            except Exception as e:
+                texto_no_console(f"Código: {nome_arquivo} --> provavelmente não tem imagem disponível na API.")
 
 
     def verificar_e_substituir_nome_padrao(self, nome_padrao):

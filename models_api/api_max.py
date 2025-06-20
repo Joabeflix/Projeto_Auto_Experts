@@ -96,12 +96,18 @@ def puxar_dados_produto_api(access_token, codigo_produto, dados_necessarios=None
 
     return retorno
 
-def puxar_dados_veiculos_api(access_token, lista_veiculos):
+def puxar_dados_veiculos_api(access_token, lista_veiculos, atualizar_barra_anuncio):
     api_cliente = APICliente(access_token)
     url_path = 'veiculos/codigo'
     veiculos_completos = []
 
+    total = len(lista_veiculos)
+    feito = 0
+
     for item in lista_veiculos:
+        if atualizar_barra_anuncio:
+            progresso = int((feito / total) * 100)
+            atualizar_barra_anuncio(progresso)
         # Um time pequeno para evitar requisições muito rápidas
         time.sleep(0.05)
         codigo = item.get('codigo')
@@ -142,10 +148,13 @@ def puxar_dados_veiculos_api(access_token, lista_veiculos):
                 "dataAtualizacao": dados.get("dataAtualizacao")
             }
             veiculos_completos.append(veiculo)
+            feito+=1
+
         except Exception as e:
             texto_no_console(f"Erro ao processar veículo {codigo}: {e}")
             continue
 
+    atualizar_barra_anuncio(0)
     return veiculos_completos
 
 
@@ -153,5 +162,5 @@ def puxar_dados_veiculos_api(access_token, lista_veiculos):
 
 if __name__ == "__main__":
     access_token = TokenGerador().ler_token()
-    dados_gerais = puxar_dados_produto_api(access_token=access_token, codigo_produto='C-2044', dados_necessarios=['json_completo'])
-    print(dados_gerais)
+    dados_gerais = puxar_dados_produto_api(access_token=access_token, codigo_produto='C-2044', dados_necessarios=['veiculos'])
+    print(puxar_dados_veiculos_api(access_token=access_token, lista_veiculos=dados_gerais['veiculos'], atualizar_barra_anuncio=None))

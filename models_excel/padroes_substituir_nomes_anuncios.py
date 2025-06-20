@@ -1,32 +1,10 @@
 # SUBSTITUIR DE / POR
 
 # Sempre colocar tudo minúsculo
+
+
 PADROES = {
-    "EXEMPLO": "EXEMPLE"
+    "amortecedor de suspensão": "amortecedor p/ suspensão",
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-exemplos = {
-    "cilindro mestre de freio": "Cilindro Mestre P/ Freio",
-    "reparo do cilindro mestre": "Reparo P/ Cilindro Mestre"
-}
