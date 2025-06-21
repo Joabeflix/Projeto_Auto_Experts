@@ -10,6 +10,7 @@ from models_api.api_max import puxar_dados_produto_api
 from models_api.gerar_token import TokenGerador
 import threading
 import time
+import platform
 
 class RedirecionarConsole:
     def __init__(self, text_widget):
@@ -28,6 +29,12 @@ class MinhaInterface:
         self.root = ttk.Window(themename="vapor")
         self.root.title("Criar Anúncios AutoExperts")
         self.root.geometry("1057x493")
+        
+        
+        if platform.system() == "Linux":
+            self.root.tk.call("tk", "scaling", 1.6)
+        elif platform.system() == "Windows":
+            self.root.tk.call("tk", "scaling", 1.0)
 
         """ Entrys """
         self.entrada_planilha = ttk.Entry(self.root, width=45, style='secondary')

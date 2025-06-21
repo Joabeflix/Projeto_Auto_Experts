@@ -1,7 +1,6 @@
 .env
 /venv/
 /venv_backup/
-*.txt
 __pycache__
 *.jpg
 

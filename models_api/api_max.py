@@ -52,9 +52,9 @@ class FiltroJSON:
         if item_filtro:
             try:
                 filtrados = [dado for dado in resultado if dado.get("item") == item_filtro]
-                return filtrados[0].get('descricao', 'None')
+                return filtrados[0].get('descricao', '')
             except (IndexError, KeyError):
-                return 'None'
+                return ''
 
         return resultado
 
@@ -135,7 +135,6 @@ def puxar_dados_veiculos_api(access_token, lista_veiculos, atualizar_barra_anunc
                 "marca": dados.get("marca"),
                 "nome": dados.get("nome"),
                 "modelo": dados.get("modelo"),
-                "anosDeVenda": dados.get("anosDeVenda", []),
                 "inicioProducao": dados.get("inicioProducao"),
                 "finalProducao": dados.get("finalProducao"),
                 "mercado": dados.get("mercado", {}).get("nome", ""),
@@ -162,5 +161,5 @@ def puxar_dados_veiculos_api(access_token, lista_veiculos, atualizar_barra_anunc
 
 if __name__ == "__main__":
     access_token = TokenGerador().ler_token()
-    dados_gerais = puxar_dados_produto_api(access_token=access_token, codigo_produto='C-2044', dados_necessarios=['veiculos'])
-    print(puxar_dados_veiculos_api(access_token=access_token, lista_veiculos=dados_gerais['veiculos'], atualizar_barra_anuncio=None))
+    dados_gerais = puxar_dados_produto_api(access_token=access_token, codigo_produto='HG 41111', dados_necessarios=['similares'])
+    print(dados_gerais)

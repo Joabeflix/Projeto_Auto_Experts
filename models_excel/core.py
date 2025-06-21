@@ -37,17 +37,31 @@ class Gerar_Anuncios:
         coluna_descricao_simplificada = []
         coluna_posicao = []
         coluna_lado = []
+        
+        # NEWS
+        coluna_ncm = []
+        coluna_garantia = []
+        
+        coluna_peso = []
+        coluna_altura_embalagem = []
+        coluna_largura_embalagem = []
+        coluna_comprimento_embalagem = []
+
+        coluna_qtd_por_embalagem = []
+        
+
 
         dados_puxar = [
             'nome', 'grupo_produto', 'aplicacao', 'marca',
             'part_number', 'ean', 'posicao', 'lado', 
-            'imagem_url', 'veiculos'
+            'imagem_url', 'veiculos', 'ncm', 'garantia',
+            'peso', 'altura_embalagem', 'largura_embalagem',
+            'comprimento_embalagem', 'qtd_embalagem', 'similares'
         ]
 
         qtd_feita = 1
         for cod in coluna_codigo:
             dados_anuncio = puxar_dados_produto_api(self.acces_token, codigo_produto=cod, dados_necessarios=dados_puxar)
-
             if not dados_anuncio:
                 for coluna in [coluna_nome_anuncio, coluna_ean, coluna_nome_ate_60, coluna_descricao_completa, coluna_posicao, coluna_lado]:
                     coluna.append('Não encontrado API')
@@ -62,48 +76,73 @@ class Gerar_Anuncios:
             lado = dados_anuncio['lado']
             marca = dados_anuncio['marca']
             codigo_produto = dados_anuncio['part_number']
-            ean = dados_anuncio['ean']
-
+      
             _nome_anuncio = f'{nome_produto} Compatível {self.extrair_primeira_data(veiculo_titulo)} {posicao} {lado} {marca} {codigo_produto}'.title()
             nome_anuncio = " ".join(_nome_anuncio.replace('None', ' ').split()).title()
 
             nome_ate_60 = deixar_nome_ate_60_caracteres(nome_anuncio, codigo_produto, marca)
+            texto_no_console(f'Cód: {cod} - Nome gerado: {nome_ate_60}')
 
             coluna_nome_anuncio.append(nome_anuncio)
-            texto_no_console(f'Cód: {cod} - Nome gerado: {nome_ate_60}')
-            coluna_ean.append(ean)
+            coluna_ean.append(dados_anuncio['ean'])
             coluna_nome_ate_60.append(nome_ate_60)
             coluna_posicao.append(posicao)
             coluna_lado.append(lado)
+            coluna_ncm.append(dados_anuncio['ncm'])
+            coluna_garantia.append(dados_anuncio['garantia'])
+            coluna_peso.append(dados_anuncio['peso'])
+            coluna_altura_embalagem.append(dados_anuncio['altura_embalagem'])
+            coluna_largura_embalagem.append(dados_anuncio['largura_embalagem'])
+            coluna_comprimento_embalagem.append(dados_anuncio['comprimento_embalagem'])
+            coluna_qtd_por_embalagem.append(dados_anuncio['qtd_embalagem'])
 
             def gerar_aplicacao_veiculo():
                 texto_no_console(f'Gerando aplicação do código {dados_anuncio["part_number"]}')
-                lista_veiculos = puxar_dados_veiculos_api(
+                
+                
+                # Na lista de veículos crua temos a data inicial de aplicação e a data final
+                # No entando não temos o veículo... temos somente o código do veículo.
+                # Então para pegar o veículo exato, chamanos outra função na API e retornamos os veículos
+                lista_de_veiculos_crua = dados_anuncio['veiculos']
+                
+                lista_veiculos_api = puxar_dados_veiculos_api(
                     access_token=self.acces_token,
-                    lista_veiculos=dados_anuncio['veiculos'],
+                    lista_veiculos=lista_de_veiculos_crua,
                     atualizar_barra_anuncio=self.atualizar_barra_anuncio
                 )
                 parte_de_cima_aplicacao = f"Produto: {dados_anuncio['nome']}\nMarca: {dados_anuncio['marca']}\nCódigo Produto: {dados_anuncio['part_number']}\n\nCompatível com os veículos:\n"
                 linhas_aplicacao = []
-                for veiculo in lista_veiculos:
+                for veiculo, ano_aplicacao in zip(lista_veiculos_api, lista_de_veiculos_crua):
                     try:
                         marca = veiculo.get('marca', '')
                         nome = veiculo.get('nome', '')
                         modelo = veiculo.get('modelo', '')
-                        anos = veiculo.get('anosDeVenda', [])
                         motorizacao = veiculo.get('motorizacao', {})
                         motor_nome = motorizacao.get('nome', '')
                         cilindrada = motorizacao.get('cilindrada', '')
                         configuracao = motorizacao.get('configuracao', '')
                         potencia = motorizacao.get('potenciaCv', '')
-                        anos_formatado = f"{min(anos)} a {max(anos)}" if anos else "Ano não disponível"
-                        linha = f"{marca} {nome} {modelo} {anos_formatado} - Motor: {motor_nome} {cilindrada}cc {configuracao} {potencia}cv"
+                        anos = f"{ano_aplicacao['anoInicial']}-{ano_aplicacao['anoFinal']}"
+                        linha = f"{marca} {nome} {modelo} {anos} - Motor: {motor_nome} {cilindrada}cc {configuracao} {potencia}cv"
                         linhas_aplicacao.append(linha.strip())
 
                     except Exception as e:
                         texto_no_console(f"Erro ao montar aplicação para veículo: {e}")
+                
+                lista_similares = []
+                for item in dados_anuncio['similares']:
+                    try:
+                        lista_similares.append(f"{item['marca']['nome']}: {item['partNumber']}")
+                    except Exception as e:
+                        texto_no_console(f"Erro ao montar os similares: {e}")
+                        
+                        
+                        
                 texto_no_console('Aplicação montada com sucesso!')
-                return f'{parte_de_cima_aplicacao}{"\n".join(linhas_aplicacao)}'
+                
+                
+                linhas_similares = f"\n\nCódigos similares:\n{"\n".join(lista_similares)}" if lista_similares else ''
+                return f'{parte_de_cima_aplicacao}{"\n".join(linhas_aplicacao)}{linhas_similares}'
 
             aplicacao_completa = gerar_aplicacao_veiculo()
             aplicacao_simplificada = f"Produto: {dados_anuncio['nome']}\nMarca: {marca}\nCódigo Produto: {codigo_produto}\n\nCompatível com os veículos:{veiculo_titulo}"
@@ -119,12 +158,12 @@ class Gerar_Anuncios:
             texto_no_console(f'Feito: {qtd_feita}/{qtd_produtos}')
             texto_no_console('-')
 
-            # ⏫ Atualiza o progresso (se a função estiver disponível)
             if self.atualizar_barra_geral:
                 progresso = int((qtd_feita / qtd_produtos) * 100)
                 self.atualizar_barra_geral(progresso)
 
             qtd_feita += 1
+            
 
         planilha['nome anuncio completo'] = coluna_nome_anuncio
         planilha['nome anuncio < 60'] = coluna_nome_ate_60
@@ -133,23 +172,30 @@ class Gerar_Anuncios:
         planilha['aplicacao simplificada'] = coluna_descricao_simplificada
         planilha['posicao'] = ["" if x == 'None' else x for x in coluna_posicao]
         planilha['lado'] = ["" if x == 'None' else x for x in coluna_lado]
+        planilha['ncm'] = coluna_ncm
+        planilha['garantia'] = coluna_garantia
+        planilha['peso'] = coluna_peso
+        planilha['altura embalagem'] = coluna_altura_embalagem
+        planilha['largura embalagem'] = coluna_largura_embalagem
+        planilha['comprimento embalagem'] = coluna_comprimento_embalagem
+        planilha['qtd por embalagem'] = coluna_qtd_por_embalagem
 
         planilha.to_excel('anuncios.xlsx', index=False)
         texto_no_console('Planilha de anúncios gerada com sucesso!')
         
 
-        def baixar_imagem(self, url, nome_arquivo):
-            texto_no_console(f'Baixando imagem {nome_arquivo}.')
-            try:
-                resposta = requests.get(url)
-                if resposta.status_code == 200:
-                    with open(f'{nome_arquivo}.jpg', 'wb') as f:
-                        f.write(resposta.content)
-                    texto_no_console(f"Imagem salva como: {nome_arquivo}")
-                else:
-                    texto_no_console(f"Erro ao baixar imagem. Código HTTP: {resposta.status_code}")
-            except Exception as e:
-                texto_no_console(f"Código: {nome_arquivo} --> provavelmente não tem imagem disponível na API.")
+    def baixar_imagem(self, url, nome_arquivo):
+        texto_no_console(f'Baixando imagem {nome_arquivo}.')
+        try:
+            resposta = requests.get(url)
+            if resposta.status_code == 200:
+                with open(f'{nome_arquivo}.jpg', 'wb') as f:
+                    f.write(resposta.content)
+                texto_no_console(f"Imagem salva como: {nome_arquivo}")
+            else:
+                texto_no_console(f"Erro ao baixar imagem. Código HTTP: {resposta.status_code}")
+        except Exception as e:
+            texto_no_console(f"Código: {nome_arquivo} --> provavelmente não tem imagem disponível na API.")
 
 
     def verificar_e_substituir_nome_padrao(self, nome_padrao):
